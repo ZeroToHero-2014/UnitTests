@@ -8,12 +8,8 @@ namespace Calculator.Core
 {
     public class CalculatorEngine
     {
-        public CalculatorEngine()
-        {   
-        }
-
         private double total;
-
+                
         public void Set(double value)
         {
             total = value;
@@ -36,14 +32,12 @@ namespace Calculator.Core
 
         public void Divide(double value)
         {
-            
             if (value == 0)
             {
-                DivideException e= new DivideException();
-                throw e;
+                throw new DivideException();
             }
-            total /= value;
-            
+         
+            total /= value;            
         }
 
         public void Clear()

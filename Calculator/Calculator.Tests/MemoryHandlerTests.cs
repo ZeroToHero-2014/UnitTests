@@ -12,161 +12,148 @@ namespace Calculator.Tests
     [TestClass]
     public class MemoryHandlerTests
     {
-
         [TestMethod]
-        public void Store_StoreIsCalled()
+        public void Store_GetTotalFromCalculatorIsCalled()
         {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
+            Mock<CalculatorEngine> calculatorMock = new Mock<CalculatorEngine>();
             Mock<IMemory> memoryMock = new Mock<IMemory>();
-            
-            var handler = new MemoryHandler(calculator, memoryMock.Object);
+            var handler = new MemoryHandler(calculatorMock.Object, memoryMock.Object);
+            calculatorMock.Object.Set(5);
 
             handler.Store();
 
-            memoryMock.Verify(memory => memory.Store(It.IsAny<double>()));
+            calculatorMock.Verify(c => c.GetTotal());
         }
 
         [TestMethod]
-        public void Store_GetTotalIsCalled()
+        public void Store_StoreToMemoryIsCalledWithExactArgument()
         {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
+            CalculatorEngine calculator = new CalculatorEngine();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();            
+            var handler = new MemoryHandler(calculator, memoryMock.Object);
             calculator.Set(5);
 
-            var handler = new MemoryHandler(calculator, memory);
-
             handler.Store();
 
-            Assert.AreEqual(true, calculator.GetTotalCalled);
+            //Aici am verificat ca s-a apelat cu un argument concret. 
+            //Framework-ul imi spune daca s-a apelat cu un alt argument in loc de cel asteptat
+            memoryMock.Verify(memory => memory.Store(5));
         }
-
+        
         [TestMethod]
-        public void Retrieve_RetrieveIsCalled()
-        {
-            CalculatorEngine calculator = new CalculatorEngine();
-            MemoryReplacement memory = new MemoryReplacement();
-
-            var handler = new MemoryHandler(calculator, memory);
-
-            handler.Retrieve();
-
-            Assert.IsTrue(memory.RetrieveCalled);
-        }
-
-        [TestMethod]
-        public void Retrieve_ValueIsFed()
+        public void Retrieve_RetrieveFromMemoryIsCalled()
         {
             CalculatorEngine calculator = new CalculatorEngine();
             Mock<IMemory> memoryMock = new Mock<IMemory>();
-            memoryMock.Setup(m => m.Retrieve()).Returns(6);
-
             var handler = new MemoryHandler(calculator, memoryMock.Object);
 
             handler.Retrieve();
 
-            var actualTotal = calculator.GetTotal();
-            Assert.AreEqual(6, actualTotal);
+            memoryMock.Verify(m => m.Retrieve());
         }
+
         [TestMethod]
-        public void Add_value()
+        public void Retrieve_StoredValueISetInCalcualtor()
         {
             CalculatorEngine calculator = new CalculatorEngine();
-            MemoryReplacement memory = new MemoryReplacement();
-            memory.StoredValue = 7;
-            calculator.Set(9);
-            var handler = new MemoryHandler(calculator, memory);
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculator, memoryMock.Object);
+            memoryMock.Setup(m => m.Retrieve()).Returns(6);
+
+            handler.Retrieve();
+            var actualTotal = calculator.GetTotal();
+
+            Assert.AreEqual(6, actualTotal);        
+        }
+
+        [TestMethod]
+        public void Add_GetTotalFromCalculatorIsCalled()
+        {
+            Mock<CalculatorEngine> calculatorMock = new Mock<CalculatorEngine>();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculatorMock.Object, memoryMock.Object);
 
             handler.Add();
 
-            Assert.AreEqual(16, memory.LastStoreArgument);
+            calculatorMock.Verify(c => c.GetTotal());
         }
 
         [TestMethod]
-        public void Subtract_test()
+        public void Add_RetriveFromMemoryIsCalled()
         {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
-
-            var handler = new MemoryHandler(calculator, memory);
-            handler.Subtract();
-
-            Assert.IsTrue(calculator.GetTotalCalled);
-        }
-        [TestMethod]
-        public void Substract_RetriveIsCalled()
-        {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
+            CalculatorEngine calculator = new CalculatorEngine();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculator, memoryMock.Object);
             
-            var handler = new MemoryHandler(calculator, memory);
-            handler.Subtract();
-            Assert.IsTrue(memory.RetrieveCalled);
-        }
-        [TestMethod]
-        public void Substract_StoreIsCalled()
-        {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
-            var handler = new MemoryHandler(calculator, memory);
-            handler.Subtract();
-            Assert.IsTrue(memory.StoreCalled);
-        }
-
-        [TestMethod]
-        public void Substract_value()
-        {   
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
-            var handler = new MemoryHandler(calculator, memory);
-            calculator.Set(13);
-            memory.StoredValue = 20;
-
-            handler.Subtract();
-          
-            Assert.AreEqual(7, memory.LastStoreArgument);
-        }
-
-        [TestMethod]
-        public void Add_GetTotalCalled()
-        {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
-
-            var handler = new MemoryHandler(calculator, memory);
             handler.Add();
 
-            Assert.IsTrue(calculator.GetTotalCalled);
+            memoryMock.Verify(m => m.Retrieve());
         }
-
 
         [TestMethod]
-        public void Add_RetriveIsCalled()
+        public void Add_StoreToMemoryIsCalledWithExactArguments()
         {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
+            CalculatorEngine calculator = new CalculatorEngine();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculator, memoryMock.Object);
+            calculator.Set(9);
+            memoryMock.Setup(m=>m.Retrieve()).Returns(7);
 
-            var handler = new MemoryHandler(calculator, memory);
             handler.Add();
-            Assert.IsTrue(memory.RetrieveCalled);
+            
+            memoryMock.Verify(m=>m.Store(16));
         }
+
         [TestMethod]
-        public void Add_StoreIsCalled()
+        public void Subtract_GetTotalFromCalculatorIsCalled()
         {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
-            var handler = new MemoryHandler(calculator, memory);
-            handler.Add();
-            Assert.IsTrue(memory.StoreCalled);
+            Mock<CalculatorEngine> calculatorMock = new Mock<CalculatorEngine>();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculatorMock.Object, memoryMock.Object);
+            
+            handler.Subtract();
+
+            calculatorMock.Verify(c => c.GetTotal());
         }
+
+        [TestMethod]
+        public void Substract_RetriveFromMemoryIsCalled()
+        {
+            CalculatorEngine calculatorEngine = new CalculatorEngine();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();            
+            var handler = new MemoryHandler(calculatorEngine, memoryMock.Object);
+            
+            handler.Subtract();
+
+            memoryMock.Verify(m => m.Retrieve());
+        }
+
+        [TestMethod]
+        public void Substract_StoreToMemoryIsCalledWithExactsArguments()
+        {
+            CalculatorEngine calculatorEngine = new CalculatorEngine();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculatorEngine, memoryMock.Object);
+            calculatorEngine.Set(13);
+            memoryMock.Setup(m => m.Retrieve()).Returns(20);
+
+            handler.Subtract();
+
+            memoryMock.Verify(m => m.Store(7));
+        }
+
+        
 
         [TestMethod]
         public void Clear_ClearIsCalled()
         {
-            CalculatorEngineDummy calculator = new CalculatorEngineDummy();
-            MemoryReplacement memory = new MemoryReplacement();
-            var handler = new MemoryHandler(calculator, memory);
+            CalculatorEngine calculator = new CalculatorEngine();
+            Mock<IMemory> memoryMock = new Mock<IMemory>();
+            var handler = new MemoryHandler(calculator, memoryMock.Object);
+            
             handler.Clear();
-            Assert.IsTrue(memory.ClearIsCalled);
+
+            memoryMock.Verify(m => m.Clear());
         }
 
     }

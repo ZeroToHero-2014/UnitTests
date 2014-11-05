@@ -12,108 +12,122 @@ namespace Calculator.Tests
     public class CalculatorEngineTests
     {
         [TestMethod]
-        public void GetTotal_Default_Returns0()
+        public void GetTotal_Default_ReturnsZero()
         {
+            //Arrange
             CalculatorEngine engine = new CalculatorEngine();
 
-            var total = engine.GetTotal();
+            //Act
+            double total = engine.GetTotal();
 
+            //Assert
             Assert.AreEqual(0, total);
         }
 
         [TestMethod]
-        public void Set_5_TotalIsAsExpected()
+        public void Set_With5_TotalReturns5()
         {
+            //Arrange
             CalculatorEngine engine = new CalculatorEngine();
-
             engine.Set(5);
-            var total = engine.GetTotal();
+            
+            //Act
+            double total = engine.GetTotal();
 
+            //Assert
             Assert.AreEqual(5, total);
         }
 
         [TestMethod]
-        public void Add_TestAdd()
+        public void Add_10With5_TotalReturns15()
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(10);
-            engine.Add(5);
 
-            var total = engine.GetTotal();
+            engine.Add(5);
+            double total = engine.GetTotal();
 
             Assert.AreEqual(15, total);
         }
 
         [TestMethod]
-        public void Subtract_5From7_TotalIs2()
+        public void Subtract_5From7_TotalReturns2()
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(7);
 
             engine.Subtract(5);
+            double total = engine.GetTotal();
 
-            Assert.AreEqual(2, engine.GetTotal());
+            Assert.AreEqual(2, total);
         }
 
         [TestMethod]
-        public void Test_Multiply()
+        public void Multiply_6ByDefault_ReturnsZero()
         {
             CalculatorEngine engine = new CalculatorEngine();
-            engine.Multiply(6);
 
-            Assert.AreEqual(0, engine.GetTotal());
+            engine.Multiply(6);
+            double total = engine.GetTotal();
+
+            Assert.AreEqual(0, total);
         }
 
         [TestMethod]
-        public void Test_AnotherMultiply()
+        public void Multiply_2By20_TotalReturns40()
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(20);
             
             engine.Multiply(2);
+            double total = engine.GetTotal();
             
-            Assert.AreEqual(40, engine.GetTotal());
+            Assert.AreEqual(40, total);
         }
 
         [TestMethod]
-        public void Test_Divide()
+        public void Divide_20By10_TotalReturns2()
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(20);
 
             engine.Divide(10);
-            
-            Assert.AreEqual(2, engine.GetTotal());
+            double total = engine.GetTotal();
+
+            Assert.AreEqual(2, total);
         }
 
         [TestMethod]
-        public void Divide_ByZero_ThrowsException()
+        public void Divide_ByZero_ThrowsDivideException()
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(10);
+
+            Exception thrownException = null;
 
             try
             {
                 engine.Divide(0);
             }
 
-            catch(DivideException) 
+            catch(DivideException ex) 
             {
-                Assert.IsTrue(true);
-                return;
+                thrownException = ex;
             }
 
-            Assert.Fail();
+            Assert.IsInstanceOfType(thrownException, typeof(DivideException));
         }
 
         [TestMethod]
-        public void test_clear()
+        public void Clear_Exists114_TotalReturnsZero()
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(114);
 
             engine.Clear();
-            Assert.AreEqual(0, engine.GetTotal());
+            double total = engine.GetTotal();
+
+            Assert.AreEqual(0, total);
         }
 
     }

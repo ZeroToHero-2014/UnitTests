@@ -8,32 +8,30 @@ namespace Calculator.Core
 {
     public class MemoryHandler
     {
-        private CalculatorEngine engine;
+        private CalculatorEngine calculatorEngine;
         private IMemory memory;
 
-        public MemoryHandler(CalculatorEngine engine, IMemory memory)
+        public MemoryHandler(CalculatorEngine calculatorEngine, IMemory memory)
         {
-            this.engine = engine;
+            this.calculatorEngine = calculatorEngine;
             this.memory = memory;
         }
 
         public void Add()
         {
-            var total = engine.GetTotal();
-            var totalm = memory.Retrieve();
-            var totalt = total + totalm;
-            memory.Store(totalt);
+            double total = memory.Retrieve() + calculatorEngine.GetTotal();
+            memory.Store(total);
         }
 
         public void Subtract()
         {
-            var total = memory.Retrieve() - engine.GetTotal();
+            var total = memory.Retrieve() - calculatorEngine.GetTotal();
             memory.Store(total);
         }
 
         public void Store()
         {
-            var total = engine.GetTotal();
+            var total = calculatorEngine.GetTotal();
             memory.Store(total);
         }
 
@@ -45,7 +43,7 @@ namespace Calculator.Core
         public void Retrieve()
         {
             var storedValue = memory.Retrieve();
-            engine.Set(storedValue);
+            calculatorEngine.Set(storedValue);
         }
     }
 }
