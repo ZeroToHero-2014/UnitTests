@@ -27,18 +27,19 @@ namespace Calculator.Core
 
         public void Subtract()
         {
-            engine.GetTotal();
-            memory.Retrieve();
+            var total = memory.Retrieve() - engine.GetTotal();
+            memory.Store(total);
         }
 
         public void Store()
         {
             var total = engine.GetTotal();
-            memory.Store(total);            
+            memory.Store(total);
         }
 
         public void Clear()
         {
+            memory.Clear();
         }
 
         public void Retrieve()

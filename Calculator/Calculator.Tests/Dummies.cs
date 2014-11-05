@@ -20,7 +20,7 @@ namespace Calculator.Tests
 
         public void Clear()
         {
-
+            ClearIsCalled = true;
         }
 
         public double StoredValue { get; set; }
@@ -31,6 +31,8 @@ namespace Calculator.Tests
             RetrieveCalled = true;
             return StoredValue;
         }
+
+        public bool ClearIsCalled { get; set; }
     }
 
     public class CalculatorEngineDummy : CalculatorEngine
