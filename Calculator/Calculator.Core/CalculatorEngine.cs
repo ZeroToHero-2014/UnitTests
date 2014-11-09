@@ -8,46 +8,150 @@ namespace Calculator.Core
 {
     public class CalculatorEngine
     {
-        private double total;
-                
-        public void Set(double value)
+        private Queue<OrderPriorityValue> operations;
+        private double initialValue;
+
+        public CalculatorEngine()
         {
-            total = value;
+            operations = new Queue<OrderPriorityValue>();
         }
 
-        public void Add(double value)
+        public virtual void Set(double value)
         {
-            total += value;
+            if (operations.Count != 0) throw new InvalidOperationException();
+
+            operations.Enqueue(new OrderPriorityValue(AddOperation, 0, value));
         }
 
-        public void Subtract(double value)
+        private double SetOperation(double value, double totalSoFar)
         {
-            total -= value;
+            return value;
         }
 
-        public void Multiply(double value)
+        public virtual void Add(double value)
         {
-            total *= value;
+            if (operations.Count == 0) Set(0);
+            operations.Enqueue(new OrderPriorityValue(AddOperation, 0, value));
         }
 
-        public void Divide(double value)
+        private double AddOperation(double value, double totalSoFar)
+        {
+            return totalSoFar + value;
+        }
+
+        public virtual void Subtract(double value)
+        {
+            if (operations.Count == 0) Set(0);
+            operations.Enqueue(new OrderPriorityValue(SubtractOperation, 0, value));
+        }
+
+        private double SubtractOperation(double value, double totalSoFar)
+        {
+            return totalSoFar - value;
+        }
+
+        public virtual void Multiply(double value)
+        {
+            if (operations.Count == 0) Set(0);
+            operations.Enqueue(new OrderPriorityValue(MultiplyOperation, 1, value));
+        }
+
+        private double MultiplyOperation(double value, double totalSoFar)
+        {
+            return totalSoFar * value;
+        }
+
+        public virtual void Divide(double value)
+        {
+            if (operations.Count == 0) Set(0);
+            operations.Enqueue(new OrderPriorityValue(DivideOperation, 1, value));
+        }
+
+        public double DivideOperation(double value, double totalSoFar)
         {
             if (value == 0)
             {
-                throw new DivideException();
+                DivideException e = new DivideException();
+                throw e;
             }
-         
-            total /= value;            
+            else
+            {
+                return totalSoFar / value;
+            }
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
-            total = 0;
+            operations.Clear();
         }
 
         public virtual double GetTotal()
         {
-            return  total;
+            var maxPriority = operations.Max(m => m.Prioritate);
+
+            return GetTotalInternal(maxPriority, new Queue<OrderPriorityValue>(operations));
+        }
+
+        private virtual double GetTotalInternal(double currentPriority, Queue<OrderPriorityValue> operations)
+        {
+
+            Queue<OrderPriorityValue> newQueue = new Queue<OrderPriorityValue>();
+
+            OrderPriorityValue previousOperation = null;
+            OrderPriorityValue currentOperation = null;
+            while (operations.Count > 0)
+            {
+                if (previousOperation == null)
+                {
+                    previousOperation = operations.Dequeue();
+                }
+                else
+                {
+                    currentOperation = operations.Dequeue();
+                    if (currentOperation.Prioritate == currentPriority)
+                    {
+                        var currentTotal = currentOperation.Run(previousOperation.Valoare);
+                        previousOperation = new OrderPriorityValue(previousOperation.Operatie, previousOperation.Prioritate, currentTotal);
+                    }
+                    else
+                    {
+                        newQueue.Enqueue(previousOperation);
+                        previousOperation = currentOperation;
+                    }
+                }
+            }
+
+            if (newQueue.Count == 1)
+            {
+                var uniqueOperation = newQueue.Dequeue();
+                return uniqueOperation.Run(0);
+            }
+            else
+            {
+                var maxPriority = newQueue.Max(m => m.Prioritate);
+
+                return GetTotalInternal(maxPriority, newQueue);
+            }
+        }
+    }
+
+    public class OrderPriorityValue
+    {
+        public double Valoare { get; set; }
+        public Func<double, double, double> Operatie { get; private set; }
+
+        public OrderPriorityValue(Func<double, double, double> operatie, int prioritate, double valoare)
+        {
+            this.Operatie = operatie;
+            this.Prioritate = prioritate;
+            this.Valoare = valoare;
+        }
+
+        public int Prioritate { get; set; }
+
+        public double Run(double totalSoFar)
+        {
+            return Operatie(Valoare, totalSoFar);
         }
     }
 }

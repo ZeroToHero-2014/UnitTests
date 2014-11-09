@@ -1,5 +1,6 @@
 ﻿using Calculator.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Calculator.Tests
             //Arrange
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(5);
-            
+
             //Act
             double total = engine.GetTotal();
 
@@ -78,10 +79,10 @@ namespace Calculator.Tests
         {
             CalculatorEngine engine = new CalculatorEngine();
             engine.Set(20);
-            
+
             engine.Multiply(2);
             double total = engine.GetTotal();
-            
+
             Assert.AreEqual(40, total);
         }
 
@@ -110,7 +111,7 @@ namespace Calculator.Tests
                 engine.Divide(0);
             }
 
-            catch(DivideException ex) 
+            catch (DivideException ex)
             {
                 thrownException = ex;
             }
@@ -129,6 +130,5 @@ namespace Calculator.Tests
 
             Assert.AreEqual(0, total);
         }
-
     }
 }
